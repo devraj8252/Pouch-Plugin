@@ -1,0 +1,28 @@
+# ============================================
+#          MagicPouch Configuration
+# ============================================
+
+messages:
+  prefix: "&d&l✦ &5MagicPouch &d&l✦ &r"
+  no-pouch: "&cYou haven't crafted a Magic Pouch yet! Craft one first."
+  already-have-pouch: "&cYou already have a Magic Pouch!"
+  pouch-created: "&aYour Magic Pouch has been created! Use &e/pouch &ato open it."
+  upgraded: "&aPouch upgraded to &e%tier%&a! You now have &e%slots% slots&a."
+  max-tier: "&cYour pouch is already at maximum tier!"
+  wrong-tier: "&cYou need a Tier &e%current% &cpouch to use this upgrade kit!"
+  locker-equipped: "&a⚡ Soul Locker equipped! Your pouch items are now protected on death."
+  locker-removed: "&eYou removed your Soul Locker."
+  no-locker-in-inventory: "&cYou don't have a Soul Locker in your inventory!"
+  death-protected: "&a⚡ Your Soul Locker protected your pouch items! The locker was consumed."
+  death-lost: "&c☠ You didn't have a Soul Locker! Your pouch items were dropped."
+  no-items-lost: "&7No items were in your pouch."
+
+# Sound effects
+sounds:
+  open-pouch: BLOCK_ENDER_CHEST_OPEN
+  close-pouch: BLOCK_ENDER_CHEST_CLOSE
+  upgrade: ENTITY_PLAYER_LEVELUP
+  equip-locker: BLOCK_BEACON_ACTIVATE
+  remove-locker: BLOCK_BEACON_DEACTIVATE
+  death-protected: ITEM_TOTEM_USE
+  error: ENTITY_VILLAGER_NO
