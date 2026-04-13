@@ -1,0 +1,11 @@
+name: MagicPouch
+version: '1.0.0'
+main: com.magicpouch.MagicPouch
+api-version: '1.21'
+description: A magical upgradeable pouch for extra portable storage with death protection
+author: MagicPouch
+commands:
+  pouch:
+    description: Open your Magic Pouch
+    usage: /pouch
+    aliases: [p]
