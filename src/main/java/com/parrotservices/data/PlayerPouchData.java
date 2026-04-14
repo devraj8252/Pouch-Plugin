@@ -60,7 +60,11 @@ public class PlayerPouchData {
      * Returns the number of unlocked storage slots based on current tier.
      */
     public int getMaxSlots() {
-        return PSMagicPouch.getInstance().getConfigManager().getTiers().getInt("tiers." + tier + ".slots", tier * 9);
+        PSMagicPouch plugin = PSMagicPouch.getInstance();
+        if (plugin == null || plugin.getConfigManager() == null || plugin.getConfigManager().getTiers() == null) {
+            return tier * 9; // Fallback
+        }
+        return plugin.getConfigManager().getTiers().getInt("tiers." + tier + ".slots", tier * 9);
     }
 
     /**

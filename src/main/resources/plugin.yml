@@ -1,4 +1,4 @@
-name: PS-Magic Pouch
+name: PS-MagicPouch
 version: '${version}'
 main: com.parrotservices.PSMagicPouch
 api-version: '1.21'

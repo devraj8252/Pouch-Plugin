@@ -27,25 +27,36 @@ public class ConfigManager {
 
     public void setup() {
         if (!plugin.getDataFolder().exists()) {
-            plugin.getDataFolder().mkdir();
+            plugin.getDataFolder().mkdirs();
         }
 
         tiersFile = new File(plugin.getDataFolder(), "tiers.yml");
         guiFile = new File(plugin.getDataFolder(), "gui.yml");
         messagesFile = new File(plugin.getDataFolder(), "messages.yml");
 
-        if (!tiersFile.exists()) plugin.saveResource("tiers.yml", false);
-        if (!guiFile.exists()) plugin.saveResource("gui.yml", false);
-        if (!messagesFile.exists()) plugin.saveResource("messages.yml", false);
+        if (!tiersFile.exists()) {
+            plugin.saveResource("tiers.yml", false);
+        }
+        if (!guiFile.exists()) {
+            plugin.saveResource("gui.yml", false);
+        }
+        if (!messagesFile.exists()) {
+            plugin.saveResource("messages.yml", false);
+        }
 
         reload();
     }
 
     public void reload() {
+        // Initialize files if they were nulled
+        if (tiersFile == null) tiersFile = new File(plugin.getDataFolder(), "tiers.yml");
+        if (guiFile == null) guiFile = new File(plugin.getDataFolder(), "gui.yml");
+        if (messagesFile == null) messagesFile = new File(plugin.getDataFolder(), "messages.yml");
+
         tiersConfig = YamlConfiguration.loadConfiguration(tiersFile);
         guiConfig = YamlConfiguration.loadConfiguration(guiFile);
         messagesConfig = YamlConfiguration.loadConfiguration(messagesFile);
-        plugin.reloadConfig(); // Also reload main config
+        plugin.reloadConfig();
     }
 
     public FileConfiguration getTiers() {
