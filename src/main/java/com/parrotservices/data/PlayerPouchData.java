@@ -1,5 +1,6 @@
-package com.magicpouch.data;
+package com.parrotservices.data;
 
+import com.parrotservices.PSMagicPouch;
 import org.bukkit.inventory.ItemStack;
 
 /**
@@ -59,7 +60,7 @@ public class PlayerPouchData {
      * Returns the number of unlocked storage slots based on current tier.
      */
     public int getMaxSlots() {
-        return tier * 9;
+        return PSMagicPouch.getInstance().getConfigManager().getTiers().getInt("tiers." + tier + ".slots", tier * 9);
     }
 
     /**

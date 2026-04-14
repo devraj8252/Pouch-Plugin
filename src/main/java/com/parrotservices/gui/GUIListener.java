@@ -1,7 +1,7 @@
-package com.magicpouch.gui;
+package com.parrotservices.gui;
 
-import com.magicpouch.MagicPouch;
-import com.magicpouch.data.PlayerPouchData;
+import com.parrotservices.PSMagicPouch;
+import com.parrotservices.data.PlayerPouchData;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
@@ -30,9 +30,9 @@ import org.bukkit.persistence.PersistentDataType;
  */
 public class GUIListener implements Listener {
 
-    private final MagicPouch plugin;
+    private final PSMagicPouch plugin;
 
-    public GUIListener(MagicPouch plugin) {
+    public GUIListener(PSMagicPouch plugin) {
         this.plugin = plugin;
     }
 
@@ -101,14 +101,18 @@ public class GUIListener implements Listener {
         // === Locker Slot ===
         if (rawSlot == PouchGUI.LOCKER_SLOT) {
             e.setCancelled(true);
-            handleLockerClick(player, data, e.getInventory());
+            if (plugin.getConfig().getBoolean("features.soul-locker", true)) {
+                handleLockerClick(player, data, e.getInventory());
+            }
             return;
         }
 
         // === Upgrade Slot ===
         if (rawSlot == PouchGUI.UPGRADE_SLOT) {
             e.setCancelled(true);
-            handleUpgradeClick(player, data);
+            if (plugin.getConfig().getBoolean("features.upgrades", true)) {
+                handleUpgradeClick(player, data);
+            }
             return;
         }
 
@@ -187,7 +191,7 @@ public class GUIListener implements Listener {
         if (data.hasLocker()) {
             // Remove locker → give Soul Locker item back
             data.setLocker(false);
-            inv.setItem(PouchGUI.LOCKER_SLOT, PouchGUI.createLockerDisplay(false));
+            inv.setItem(PouchGUI.LOCKER_SLOT, PouchGUI.createLockerDisplay(false, plugin));
             // Update title item
             inv.setItem(PouchGUI.TITLE_SLOT, null);
 
@@ -210,7 +214,7 @@ public class GUIListener implements Listener {
             lockerItem.setAmount(lockerItem.getAmount() - 1);
 
             data.setLocker(true);
-            inv.setItem(PouchGUI.LOCKER_SLOT, PouchGUI.createLockerDisplay(true));
+            inv.setItem(PouchGUI.LOCKER_SLOT, PouchGUI.createLockerDisplay(true, plugin));
 
             sendMessage(player, "locker-equipped");
             playSound(player, "sounds.equip-locker", "BLOCK_BEACON_ACTIVATE");
@@ -261,9 +265,11 @@ public class GUIListener implements Listener {
             playSound(player, "sounds.upgrade", "ENTITY_PLAYER_LEVELUP");
         }, 2L);
 
-        String msg = plugin.getConfig().getString("messages.upgraded", "&aUpgraded to %tier%!")
-                .replace("%tier%", PouchGUI.TIER_NAMES[nextTier - 1])
-                .replace("%slots%", String.valueOf(nextTier * 9));
+        String nextTierName = plugin.getConfigManager().getTiers().getString("tiers." + nextTier + ".name", "Tier " + nextTier);
+        int nextTierSlots = plugin.getConfigManager().getTiers().getInt("tiers." + nextTier + ".slots", nextTier * 9);
+        String msg = plugin.getConfigManager().getMessages().getString("messages.upgraded", "&aUpgraded to %tier%!")
+                .replace("%tier%", nextTierName)
+                .replace("%slots%", String.valueOf(nextTierSlots));
         player.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(getPrefix() + msg));
     }
 
@@ -273,7 +279,7 @@ public class GUIListener implements Listener {
         for (ItemStack item : player.getInventory().getContents()) {
             if (item != null && item.hasItemMeta()) {
                 if (item.getItemMeta().getPersistentDataContainer()
-                        .has(MagicPouch.LOCKER_KEY, PersistentDataType.BYTE)) {
+                        .has(PSMagicPouch.LOCKER_KEY, PersistentDataType.BYTE)) {
                     return item;
                 }
             }
@@ -285,7 +291,7 @@ public class GUIListener implements Listener {
         for (ItemStack item : player.getInventory().getContents()) {
             if (item != null && item.hasItemMeta()) {
                 Integer tier = item.getItemMeta().getPersistentDataContainer()
-                        .get(MagicPouch.UPGRADE_KEY, PersistentDataType.INTEGER);
+                        .get(PSMagicPouch.UPGRADE_KEY, PersistentDataType.INTEGER);
                 if (tier != null && tier == targetTier) {
                     return item;
                 }
@@ -301,19 +307,19 @@ public class GUIListener implements Listener {
                 .decoration(net.kyori.adventure.text.format.TextDecoration.BOLD, true)
                 .decoration(net.kyori.adventure.text.format.TextDecoration.ITALIC, false));
         meta.setEnchantmentGlintOverride(true);
-        meta.getPersistentDataContainer().set(MagicPouch.LOCKER_KEY, PersistentDataType.BYTE, (byte) 1);
+        meta.getPersistentDataContainer().set(PSMagicPouch.LOCKER_KEY, PersistentDataType.BYTE, (byte) 1);
         item.setItemMeta(meta);
         return item;
     }
 
     private void sendMessage(Player player, String key) {
         String prefix = getPrefix();
-        String msg = plugin.getConfig().getString("messages." + key, "");
+        String msg = plugin.getConfigManager().getMessages().getString("messages." + key, "");
         player.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(prefix + msg));
     }
 
     private String getPrefix() {
-        return plugin.getConfig().getString("messages.prefix", "&d&l✦ &5MagicPouch &d&l✦ &r");
+        return plugin.getConfigManager().getMessages().getString("prefix", "&d&l✦ &5PS-Magic Pouch &d&l✦ &r");
     }
 
     private void playSound(Player player, String configKey, String fallback) {

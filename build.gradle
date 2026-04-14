@@ -2,7 +2,7 @@ plugins {
     id 'java'
 }
 
-group = 'com.magicpouch'
+group = 'com.parrotservices'
 version = '1.0.0'
 
 java {
@@ -24,7 +24,7 @@ dependencies {
 }
 
 jar {
-    archiveBaseName.set('MagicPouch')
+    archiveBaseName.set('PS-MagicPouch')
     archiveVersion.set(version)
 }
 

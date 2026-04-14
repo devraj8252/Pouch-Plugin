@@ -1,11 +1,16 @@
-name: MagicPouch
+name: PS-Magic Pouch
 version: '${version}'
-main: com.magicpouch.MagicPouch
+main: com.parrotservices.PSMagicPouch
 api-version: '1.21'
 description: A magical upgradeable pouch for extra portable storage with death protection
-author: MagicPouch
+author: Parrot Services
 commands:
   pouch:
-    description: Open your Magic Pouch
-    usage: /pouch
-    aliases: [p]
+    description: Main command for PS-Magic Pouch
+    usage: /pouch [admin|reload]
+    aliases: [p, magicpouch]
+
+permissions:
+  magicpouch.admin:
+    description: Allows access to admin commands (reload, give)
+    default: op

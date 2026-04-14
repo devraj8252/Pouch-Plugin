@@ -1,0 +1,36 @@
+# ============================================
+#          Tier Configuration
+# ============================================
+# Max 5 tiers supported by GUI
+
+tiers:
+  '1':
+    name: "Basic"
+    color: "WHITE"
+    material: "WHITE_DYE"
+    slots: 9
+    upgrade-requirement: "Unknown" # Base tier
+  '2':
+    name: "Reinforced"
+    color: "AQUA"
+    material: "LIGHT_BLUE_DYE"
+    slots: 18
+    upgrade-requirement: "4× Leather + 4× Iron + Iron Block"
+  '3':
+    name: "Enhanced"
+    color: "GREEN"
+    material: "LIME_DYE"
+    slots: 27
+    upgrade-requirement: "4× Iron + 4× Gold + Gold Block"
+  '4':
+    name: "Superior"
+    color: "GOLD"
+    material: "ORANGE_DYE"
+    slots: 36
+    upgrade-requirement: "4× Gold + 4× Diamond + Diamond Block"
+  '5':
+    name: "Legendary"
+    color: "LIGHT_PURPLE"
+    material: "MAGENTA_DYE"
+    slots: 45
+    upgrade-requirement: "4× Diamond + 4× Netherite + Nether Star"

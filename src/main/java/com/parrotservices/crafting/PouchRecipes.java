@@ -1,12 +1,13 @@
-package com.magicpouch.crafting;
+package com.parrotservices.crafting;
 
-import com.magicpouch.MagicPouch;
+import com.parrotservices.PSMagicPouch;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.kyori.adventure.text.format.TextDecoration;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Material;
 import org.bukkit.NamespacedKey;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -33,29 +34,34 @@ import java.util.List;
  */
 public class PouchRecipes implements Listener {
 
-    private final MagicPouch plugin;
+    private final PSMagicPouch plugin;
     private NamespacedKey pouchRecipeKey;
 
-    // Tier display colors (matching PouchGUI)
-    private static final NamedTextColor[] TIER_COLORS = {
-            NamedTextColor.WHITE, NamedTextColor.AQUA, NamedTextColor.GREEN,
-            NamedTextColor.GOLD, NamedTextColor.LIGHT_PURPLE
-    };
-    private static final String[] TIER_NAMES = {
-            "Basic", "Reinforced", "Enhanced", "Superior", "Legendary"
-    };
+    private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacyAmpersand();
 
-    public PouchRecipes(MagicPouch plugin) {
+    public PouchRecipes(PSMagicPouch plugin) {
         this.plugin = plugin;
     }
 
     // ─── Register All Recipes ────────────────────────────
 
     public void registerAllRecipes() {
+        if (!plugin.getConfig().getBoolean("features.crafting", true)) {
+            plugin.getLogger().info("Custom crafting is globally disabled in config.");
+            return;
+        }
+
         registerPouchRecipe();
-        registerUpgradeKitRecipes();
-        registerSoulLockerRecipe();
-        plugin.getLogger().info("Registered 7 crafting recipes.");
+
+        if (plugin.getConfig().getBoolean("features.upgrades", true)) {
+            registerUpgradeKitRecipes();
+        }
+
+        if (plugin.getConfig().getBoolean("features.soul-locker", true)) {
+            registerSoulLockerRecipe();
+        }
+        
+        plugin.getLogger().info("Registered crafting recipes (respecting feature toggles).");
     }
 
     // ─── Base Pouch Recipe ───────────────────────────────
@@ -166,58 +172,66 @@ public class PouchRecipes implements Listener {
 
     // ─── Item Creators ───────────────────────────────────
 
-    private ItemStack createPouchItem() {
+    public ItemStack createPouchItem() {
+        String tierName = plugin.getConfigManager().getTiers().getString("tiers.1.name", "Basic");
+        int slots = plugin.getConfigManager().getTiers().getInt("tiers.1.slots", 9);
+
         ItemStack item = new ItemStack(Material.LEATHER);
         ItemMeta meta = item.getItemMeta();
-        meta.displayName(Component.text("✦ Magic Pouch ✦").color(NamedTextColor.LIGHT_PURPLE)
-                .decoration(TextDecoration.BOLD, true)
-                .decoration(TextDecoration.ITALIC, false));
+        meta.displayName(LEGACY.deserialize("✦ PS-Magic Pouch ✦"));
+        
         List<Component> lore = new ArrayList<>();
         lore.add(Component.empty());
         lore.add(lore("A magical pouch for portable storage!", NamedTextColor.GRAY));
         lore.add(Component.empty());
-        lore.add(lore("Tier: Basic", NamedTextColor.WHITE));
-        lore.add(lore("Slots: 9", NamedTextColor.WHITE));
+        lore.add(LEGACY.deserialize("&fTier: &b" + tierName).decoration(TextDecoration.ITALIC, false));
+        lore.add(LEGACY.deserialize("&fSlots: &b" + slots).decoration(TextDecoration.ITALIC, false));
         lore.add(Component.empty());
         lore.add(lore("Use /pouch to open!", NamedTextColor.YELLOW));
         meta.lore(lore);
         meta.setEnchantmentGlintOverride(true);
-        meta.getPersistentDataContainer().set(MagicPouch.POUCH_KEY, PersistentDataType.BYTE, (byte) 1);
+        meta.getPersistentDataContainer().set(PSMagicPouch.POUCH_KEY, PersistentDataType.BYTE, (byte) 1);
         item.setItemMeta(meta);
         return item;
     }
 
-    private ItemStack createUpgradeKitItem(int targetTier) {
+    public ItemStack createUpgradeKitItem(int targetTier) {
+        String tierName = plugin.getConfigManager().getTiers().getString("tiers." + targetTier + ".name", "Tier " + targetTier);
+        String tierColor = plugin.getConfigManager().getTiers().getString("tiers." + targetTier + ".color", "WHITE");
+        int slots = plugin.getConfigManager().getTiers().getInt("tiers." + targetTier + ".slots", targetTier * 9);
+
         ItemStack item = new ItemStack(Material.FIREWORK_STAR);
         ItemMeta meta = item.getItemMeta();
-        meta.displayName(Component.text("⬆ Upgrade Kit — " + TIER_NAMES[targetTier - 1])
-                .color(TIER_COLORS[targetTier - 1])
-                .decoration(TextDecoration.BOLD, true)
-                .decoration(TextDecoration.ITALIC, false));
+        meta.displayName(LEGACY.deserialize("&e⬆ Upgrade Kit — " + tierName));
+        
         List<Component> lore = new ArrayList<>();
         lore.add(Component.empty());
         lore.add(lore("Upgrades your pouch to", NamedTextColor.GRAY));
-        lore.add(Component.text("Tier " + targetTier + " — " + TIER_NAMES[targetTier - 1])
-                .color(TIER_COLORS[targetTier - 1])
-                .decoration(TextDecoration.ITALIC, false));
+        lore.add(LEGACY.deserialize("&7Tier " + targetTier + " — " + tierName).decoration(TextDecoration.ITALIC, false));
         lore.add(Component.empty());
-        lore.add(lore("Unlocks " + (targetTier * 9) + " storage slots", NamedTextColor.WHITE));
+        lore.add(lore("Unlocks " + slots + " storage slots", NamedTextColor.WHITE));
         lore.add(Component.empty());
         lore.add(lore("▸ Right-click to apply!", NamedTextColor.YELLOW));
         lore.add(lore("▸ Or click Upgrade in /pouch", NamedTextColor.YELLOW));
         meta.lore(lore);
         meta.setEnchantmentGlintOverride(true);
-        meta.getPersistentDataContainer().set(MagicPouch.UPGRADE_KEY, PersistentDataType.INTEGER, targetTier);
+        meta.getPersistentDataContainer().set(PSMagicPouch.UPGRADE_KEY, PersistentDataType.INTEGER, targetTier);
         item.setItemMeta(meta);
         return item;
     }
 
-    private ItemStack createSoulLockerItem() {
+    public ItemStack createSoulLockerItem() {
+        ConfigurationSection section = plugin.getConfigManager().getGUI().getConfigurationSection("gui.items.locker-active");
+        
         ItemStack item = new ItemStack(Material.HEART_OF_THE_SEA);
         ItemMeta meta = item.getItemMeta();
-        meta.displayName(Component.text("⚡ Soul Locker ⚡").color(NamedTextColor.AQUA)
-                .decoration(TextDecoration.BOLD, true)
-                .decoration(TextDecoration.ITALIC, false));
+        
+        if (section != null) {
+            meta.displayName(LEGACY.deserialize(section.getString("name", "")));
+        } else {
+            meta.displayName(LEGACY.deserialize("&b&l⚡ Soul Locker ⚡"));
+        }
+
         List<Component> lore = new ArrayList<>();
         lore.add(Component.empty());
         lore.add(lore("Protects your pouch items", NamedTextColor.GRAY));
@@ -229,7 +243,7 @@ public class PouchRecipes implements Listener {
         lore.add(lore("Locker slot to equip!", NamedTextColor.DARK_AQUA));
         meta.lore(lore);
         meta.setEnchantmentGlintOverride(true);
-        meta.getPersistentDataContainer().set(MagicPouch.LOCKER_KEY, PersistentDataType.BYTE, (byte) 1);
+        meta.getPersistentDataContainer().set(PSMagicPouch.LOCKER_KEY, PersistentDataType.BYTE, (byte) 1);
         item.setItemMeta(meta);
         return item;
     }
@@ -237,8 +251,8 @@ public class PouchRecipes implements Listener {
     // ─── Helpers ─────────────────────────────────────────
 
     private void sendMessage(Player player, String key) {
-        String prefix = plugin.getConfig().getString("messages.prefix", "&d&l✦ &5MagicPouch &d&l✦ &r");
-        String msg = plugin.getConfig().getString("messages." + key, "");
+        String prefix = plugin.getConfigManager().getMessages().getString("prefix", "&d&l✦ &5PS-Magic Pouch &d&l✦ &r");
+        String msg = plugin.getConfigManager().getMessages().getString("messages." + key, "");
         player.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(prefix + msg));
     }
 

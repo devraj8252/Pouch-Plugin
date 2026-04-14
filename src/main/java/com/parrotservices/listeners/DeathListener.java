@@ -1,7 +1,7 @@
-package com.magicpouch.listeners;
+package com.parrotservices.listeners;
 
-import com.magicpouch.MagicPouch;
-import com.magicpouch.data.PlayerPouchData;
+import com.parrotservices.PSMagicPouch;
+import com.parrotservices.data.PlayerPouchData;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Location;
 import org.bukkit.Sound;
@@ -20,9 +20,9 @@ import org.bukkit.inventory.ItemStack;
  */
 public class DeathListener implements Listener {
 
-    private final MagicPouch plugin;
+    private final PSMagicPouch plugin;
 
-    public DeathListener(MagicPouch plugin) {
+    public DeathListener(PSMagicPouch plugin) {
         this.plugin = plugin;
     }
 
@@ -32,12 +32,16 @@ public class DeathListener implements Listener {
         PlayerPouchData data = plugin.getDataManager().getData(player.getUniqueId());
         if (data == null) return;
 
-        // Check if the pouch has any items worth protecting
-        if (!data.hasItems()) {
-            return; // Nothing to protect or drop
+        // ─── Global Override: Always Keep Items ───
+        if (plugin.getConfig().getBoolean("features.always-keep-items", false)) {
+            // Keep everything, do nothing further
+            return;
         }
 
-        if (data.hasLocker()) {
+        // ─── Soul Locker Toggle ───
+        boolean soulLockerEnabled = plugin.getConfig().getBoolean("features.soul-locker", true);
+
+        if (soulLockerEnabled && data.hasLocker()) {
             // ── Protected: Keep items, consume locker ──
             data.setLocker(false);
             plugin.getDataManager().saveData(player.getUniqueId(), data);
@@ -74,8 +78,8 @@ public class DeathListener implements Listener {
     }
 
     private void sendMessage(Player player, String key) {
-        String prefix = plugin.getConfig().getString("messages.prefix", "&d&l✦ &5MagicPouch &d&l✦ &r");
-        String msg = plugin.getConfig().getString("messages." + key, "");
+        String prefix = plugin.getConfigManager().getMessages().getString("prefix", "&d&l✦ &5PS-Magic Pouch &d&l✦ &r");
+        String msg = plugin.getConfigManager().getMessages().getString("messages." + key, "");
         player.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(prefix + msg));
     }
 }

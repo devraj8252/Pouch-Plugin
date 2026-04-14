@@ -1,18 +1,20 @@
-package com.magicpouch;
+package com.parrotservices;
 
-import com.magicpouch.commands.PouchCommand;
-import com.magicpouch.crafting.PouchRecipes;
-import com.magicpouch.data.PouchDataManager;
-import com.magicpouch.gui.GUIListener;
-import com.magicpouch.listeners.DeathListener;
-import com.magicpouch.listeners.PlayerListener;
+import com.parrotservices.commands.PouchCommand;
+import com.parrotservices.config.ConfigManager;
+import com.parrotservices.crafting.PouchRecipes;
+import com.parrotservices.data.PouchDataManager;
+import com.parrotservices.gui.GUIListener;
+import com.parrotservices.listeners.DeathListener;
+import com.parrotservices.listeners.PlayerListener;
 import org.bukkit.NamespacedKey;
 import org.bukkit.plugin.java.JavaPlugin;
 
-public class MagicPouch extends JavaPlugin {
+public class PSMagicPouch extends JavaPlugin {
 
-    private static MagicPouch instance;
+    private static PSMagicPouch instance;
     private PouchDataManager dataManager;
+    private ConfigManager configManager;
 
     // PDC keys for identifying custom items
     public static NamespacedKey POUCH_KEY;
@@ -23,6 +25,7 @@ public class MagicPouch extends JavaPlugin {
     public void onEnable() {
         instance = this;
         saveDefaultConfig();
+        configManager = new ConfigManager(this);
 
         // Initialize keys
         POUCH_KEY = new NamespacedKey(this, "pouch_item");
@@ -33,7 +36,9 @@ public class MagicPouch extends JavaPlugin {
         dataManager = new PouchDataManager(this);
 
         // Register commands
-        getCommand("pouch").setExecutor(new PouchCommand(this));
+        PouchCommand pouchCommand = new PouchCommand(this);
+        getCommand("pouch").setExecutor(pouchCommand);
+        getCommand("pouch").setTabCompleter(pouchCommand);
 
         // Register listeners
         PouchRecipes recipes = new PouchRecipes(this);
@@ -45,7 +50,7 @@ public class MagicPouch extends JavaPlugin {
         // Register crafting recipes
         recipes.registerAllRecipes();
 
-        getLogger().info("✦ MagicPouch has been enabled! ✦");
+        getLogger().info("✦ PS-Magic Pouch has been enabled! ✦");
     }
 
     @Override
@@ -53,14 +58,18 @@ public class MagicPouch extends JavaPlugin {
         if (dataManager != null) {
             dataManager.saveAll();
         }
-        getLogger().info("✦ MagicPouch has been disabled! ✦");
+        getLogger().info("✦ PS-Magic Pouch has been disabled! ✦");
     }
 
-    public static MagicPouch getInstance() {
+    public static PSMagicPouch getInstance() {
         return instance;
     }
 
     public PouchDataManager getDataManager() {
         return dataManager;
+    }
+
+    public ConfigManager getConfigManager() {
+        return configManager;
     }
 }

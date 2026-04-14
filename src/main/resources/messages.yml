@@ -1,0 +1,27 @@
+# ============================================
+#          Messages Configuration
+# ============================================
+
+prefix: "&d&l✦ &5PS-Magic Pouch &d&l✦ &r"
+
+messages:
+  no-pouch: "&cYou haven't crafted a PS-Magic Pouch yet! Craft one first."
+  already-have-pouch: "&cYou already have a PS-Magic Pouch!"
+  pouch-created: "&aYour PS-Magic Pouch has been created! Use &e/pouch &ato open it."
+  upgraded: "&aPouch upgraded to &e%tier%&a! You now have &e%slots% slots&a."
+  max-tier: "&cYour pouch is already at maximum tier!"
+  wrong-tier: "&cYou need a Tier &e%current% &cpouch to use this upgrade kit!"
+  locker-equipped: "&a⚡ Soul Locker equipped! Your pouch items are now protected on death."
+  locker-removed: "&eYou removed your Soul Locker."
+  no-locker-in-inventory: "&cYou don't have a Soul Locker in your inventory!"
+  death-protected: "&a⚡ Your Soul Locker protected your pouch items! The locker was consumed."
+  death-lost: "&c☠ You didn't have a Soul Locker! Your pouch items were dropped."
+  no-items-lost: "&7No items were in your pouch."
+  
+  # Admin Messages
+  no-permission: "&cYou don't have permission to use this command!"
+  player-only: "&cOnly players can use this command!"
+  invalid-args: "&cInvalid arguments! Use: /pouch admin give <player> <item> [tier]"
+  player-not-found: "&cPlayer not found!"
+  item-given: "&aYou gave &e%player% &aa &e%item%&a!"
+  reloaded: "&aPlugin configuration reloaded successfully!"

@@ -1,0 +1,70 @@
+# ============================================
+#          GUI Configuration
+# ============================================
+
+gui:
+  title: "  ✦ &d&lPS-Magic Pouch &r✦ │ &l%tier_name%"
+  items:
+    locker-active:
+      material: HEART_OF_THE_SEA
+      name: "&b&l⚡ Soul Locker ⚡"
+      lore:
+        - ""
+        - "&a✔ Active — Death Protection ON"
+        - ""
+        - "&7Your pouch items will be"
+        - "&7preserved if you die."
+        - ""
+        - "&e⚠ Consumed on death!"
+        - ""
+        - "&c▸ Click to remove"
+    locker-inactive:
+      material: RED_STAINED_GLASS_PANE
+      name: "&c&l🔒 No Soul Locker"
+      lore:
+        - ""
+        - "&4✘ Unprotected"
+        - ""
+        - "&7Your pouch items will be"
+        - "&7DROPPED if you die!"
+        - ""
+        - "&3Craft a Soul Locker and"
+        - "&3have it in your inventory,"
+        - "&3then click here to equip!"
+    upgrade-info:
+      material: ANVIL
+      name: "&e&l⬆ Upgrade to %next_tier_name%"
+      lore:
+        - ""
+        - "&7Next Tier: %next_tier_color%%next_tier_name%"
+        - "&fNew Slots: &b%next_tier_slots%"
+        - ""
+        - "&eHow to Upgrade:"
+        - "&71. Craft the Upgrade Kit"
+        - "&7   for Tier %next_tier_num%"
+        - "&72. Right-click it to apply"
+        - "&7   OR click here with it"
+        - "&7   in your inventory!"
+        - ""
+        - "&3Materials: &b%materials%"
+    max-tier:
+      material: NETHER_STAR
+      name: "&6&l★ MAX TIER ★"
+      lore:
+        - ""
+        - "&aYour pouch is fully upgraded!"
+        - "&aAll 45 slots are unlocked."
+    close-button:
+      material: BARRIER
+      name: "&c&l✕ Close"
+      lore:
+        - ""
+        - "&7Click to close the pouch"
+        - "&aItems are saved automatically!"
+    locked-slot:
+      material: GRAY_STAINED_GLASS_PANE
+      name: "&8&l🔒 Locked"
+      lore:
+        - ""
+        - "&7Upgrade your pouch to"
+        - "&7unlock this slot!"

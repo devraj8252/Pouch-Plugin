@@ -1,7 +1,7 @@
-package com.magicpouch.listeners;
+package com.parrotservices.listeners;
 
-import com.magicpouch.MagicPouch;
-import com.magicpouch.data.PlayerPouchData;
+import com.parrotservices.PSMagicPouch;
+import com.parrotservices.data.PlayerPouchData;
 import net.kyori.adventure.text.serializer.legacy.LegacyComponentSerializer;
 import org.bukkit.Sound;
 import org.bukkit.entity.Player;
@@ -21,14 +21,9 @@ import org.bukkit.persistence.PersistentDataType;
  */
 public class PlayerListener implements Listener {
 
-    private final MagicPouch plugin;
+    private final PSMagicPouch plugin;
 
-    // Tier names for messages (matching PouchGUI)
-    private static final String[] TIER_NAMES = {
-            "Basic", "Reinforced", "Enhanced", "Superior", "Legendary"
-    };
-
-    public PlayerListener(MagicPouch plugin) {
+    public PlayerListener(PSMagicPouch plugin) {
         this.plugin = plugin;
     }
 
@@ -65,9 +60,15 @@ public class PlayerListener implements Listener {
         ItemMeta meta = item.getItemMeta();
 
         // ─── Check for Upgrade Kit ───
-        if (meta.getPersistentDataContainer().has(MagicPouch.UPGRADE_KEY, PersistentDataType.INTEGER)) {
+        if (meta.getPersistentDataContainer().has(PSMagicPouch.UPGRADE_KEY, PersistentDataType.INTEGER)) {
             e.setCancelled(true);
-            int targetTier = meta.getPersistentDataContainer().get(MagicPouch.UPGRADE_KEY, PersistentDataType.INTEGER);
+
+            // Global Toggle Check
+            if (!plugin.getConfig().getBoolean("features.upgrades", true)) {
+                return;
+            }
+
+            int targetTier = meta.getPersistentDataContainer().get(PSMagicPouch.UPGRADE_KEY, PersistentDataType.INTEGER);
 
             // Check if player has a pouch
             if (!plugin.getDataManager().hasData(player.getUniqueId())) {
@@ -93,7 +94,7 @@ public class PlayerListener implements Listener {
             // Check if the kit matches the next tier
             int expectedNextTier = data.getTier() + 1;
             if (targetTier != expectedNextTier) {
-                String msg = plugin.getConfig().getString("messages.wrong-tier", "&cWrong tier!")
+                String msg = plugin.getConfigManager().getMessages().getString("messages.wrong-tier", "&cWrong tier!")
                         .replace("%current%", String.valueOf(data.getTier()))
                         .replace("%tier%", String.valueOf(targetTier));
                 String prefix = getPrefix();
@@ -107,8 +108,9 @@ public class PlayerListener implements Listener {
             item.setAmount(item.getAmount() - 1);
             plugin.getDataManager().saveData(player.getUniqueId(), data);
 
-            String msg = plugin.getConfig().getString("messages.upgraded", "&aUpgraded!")
-                    .replace("%tier%", TIER_NAMES[targetTier - 1])
+            String tierName = plugin.getConfigManager().getTiers().getString("tiers." + targetTier + ".name", "Tier " + targetTier);
+            String msg = plugin.getConfigManager().getMessages().getString("messages.upgraded", "&aUpgraded!")
+                    .replace("%tier%", tierName)
                     .replace("%slots%", String.valueOf(targetTier * 9));
             player.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(getPrefix() + msg));
 
@@ -121,12 +123,12 @@ public class PlayerListener implements Listener {
 
     private void sendMessage(Player player, String key) {
         String prefix = getPrefix();
-        String msg = plugin.getConfig().getString("messages." + key, "");
+        String msg = plugin.getConfigManager().getMessages().getString("messages." + key, "");
         player.sendMessage(LegacyComponentSerializer.legacyAmpersand().deserialize(prefix + msg));
     }
 
     private String getPrefix() {
-        return plugin.getConfig().getString("messages.prefix", "&d&l✦ &5MagicPouch &d&l✦ &r");
+        return plugin.getConfigManager().getMessages().getString("prefix", "&d&l✦ &5PS-Magic Pouch &d&l✦ &r");
     }
 
     private void playSound(Player player, String soundName) {
